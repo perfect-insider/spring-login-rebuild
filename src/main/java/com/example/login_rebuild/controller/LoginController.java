@@ -2,6 +2,9 @@ package com.example.login_rebuild.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+// バリデーションに必要なアノテーションのインポート
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -28,12 +31,16 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String login(Model model, LoginForm form) {
-        var userInfo = service.searchUsersById(form.getLoginId());
-        var isCorrectUserAuth = userInfo.isPresent() &&
-                form.getPassword().equals(userInfo.get().getPassword());
+    public String login(Model model, @Validated LoginForm form, BindingResult bindingResult) {
+        // バリデーションチェック
+        // LoginFormに@Validatedアノテーションを付けることで、入力値の検証を行う
+        // BindingResultは、バリデーションの結果を保持するオブジェクト
+        if (bindingResult.hasErrors()) {
+            return "login"; // 入力エラーがある場合は再度ログイン画面を表示
+        }
 
-        if (isCorrectUserAuth) {
+        // LoginServiceのauthenticateメソッドの結果で判断
+        if (service.authenticate(form.getLoginId(), form.getPassword())) {
             // ログイン成功時の処理
             return "redirect:/menu"; // ログイン成功後のリダイレクト先
         } else {

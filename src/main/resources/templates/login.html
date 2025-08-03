@@ -4,18 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <title>ログイン画面</title>
-    <span th:text="${errorMsg}"></span>
+    <!-- <span th:text="${errorMsg}"></span> -->
+    <style>
+        .error {
+            color: red;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+    </style>
 </head>
 
 <body>
+    <!-- ログインID/PW不一致エラーの表示 -->
+    <p th:if="${errorMsg}" th:text="${errorMsg}" class="error"></p>
+
     <form th:action="@{/login}" method="post" th:object="${loginForm}">
         <div>
             <label for="loginId">ログインID:</label>
-            <input type="text" th:field="*{loginId}" />
+            <input type="text" th:field="*{loginId}"
+                th:aria-describedby="${#fields.hasErrors('loginId')} ? 'loginId-error' : null" />
+            <!-- エラーの場合のみspanが生成される -->
+            <span id="loginId-error" class="error" th:if="${#fields.hasErrors('loginId')}"
+                th:errors="*{loginId}"></span>
         </div>
         <div>
             <label for="password">パスワード:</label>
-            <input type="password" th:field="*{password}" />
+            <input type="password" th:field="*{password}"
+                th:aria-describedby="${#fields.hasErrors('password')} ? 'password-error' : null" />
+            <!-- エラーの場合のみspanが生成される -->
+            <span id="password-error" class="error" th:if="${#fields.hasErrors('password')}"
+                th:errors="*{password}"></span>
         </div>
         <div>
             <input type="submit" value="ログイン">
